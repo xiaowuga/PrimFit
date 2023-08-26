@@ -1,4 +1,4 @@
-# Structure–Aware Surface Reconstruction via Primitive Assembly
+# PrimFit
 
 ![](./images/overview.png)
 
