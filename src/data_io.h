@@ -5,8 +5,7 @@
 #ifndef PRIMFIT_DATA_IO_H
 #define PRIMFIT_DATA_IO_H
 
-#include <Eigen/Core>
-#include <Eigen/Dense>
+
 #include <happly.h>
 
 namespace PrimFit {
