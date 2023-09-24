@@ -1,4 +1,4 @@
-# PrimFit
+# PrimF
 
 ![](./images/overview.png)
 
