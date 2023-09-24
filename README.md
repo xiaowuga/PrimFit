@@ -28,7 +28,7 @@ If you make use of our work, please cite our paper:
 
 This work was partially funded by the National Key Research and Development Program (2021YFB1715900), the CAS Project for Young Scientists in Basic Research (YSBR-034), the National Natural Science Foundation of China (62172415, 62272277, 12022117), and the HKU-100 Research Award.
 
-Our code is inspired the works of [BSH](https://github.com/duxingyi-charles/Boundary_Sampled_Halfspaces), [PolyFit](https://github.com/LiangliangNan/PolyFit) and [KSR](https://www-sop.inria.fr/members/Florent.Lafarge/code/KSR.zip). I would like to thank Dr. [Xingyi Du](https://duxingyi-charles.github.io/) and Prof. [Liangliang Nan](https://3d.bk.tudelft.nl/liangliang/) for their excellent code.
+Our code is inspired the works of [BSH](https://github.com/duxingyi-charles/Boundary_Sampled_Halfspaces), [PolyFit](https://github.com/LiangliangNan/PolyFit) and [KSR](https://www-sop.inria.fr/members/Florent.Lafarge/code/KSR.zip). We would like to thank Dr. [Xingyi Du](https://duxingyi-charles.github.io/) and Prof. [Liangliang Nan](https://3d.bk.tudelft.nl/liangliang/) for their excellent code.
 
 Furthermore, we are grateful to Jiahui Lv from Shenzhen University for his valuable advice in this work. 
 
