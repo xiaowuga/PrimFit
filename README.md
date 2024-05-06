@@ -6,6 +6,10 @@
 
 **PrimFit** is the implementation of reconstruction method described in  paper “**Structure–Aware Surface Reconstruction via Primitive Assembly**”.
 
+等我投完siggraph asia，我一定公开代码，实在不好意思。
+
+Once I finish my SIGGRAPH Asia2024 paper, I will definitely make the code public. I apologize for the delay.
+
 In this paper, we extend the hypothesis and selection idea of plane-baed surface reconstruction method, [PolyFit](https://github.com/LiangliangNan/PolyFit) , to multi-type primitives and introduce an effective pruning mechanism to speed up extraction step (selection) significantly.
 
 ## Code
