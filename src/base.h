@@ -1,42 +1,64 @@
 //
 // Created by 小乌嘎 on 2023/8/31.
 //
-#include <Eigen/Core>
-#include <Eigen/Dense>
+
 
 #ifndef PRIMFIT_BASE_H
 #define PRIMFIT_BASE_H
+
+#include <Eigen/Core>
+#include <Eigen/Dense>
+
+#include <iostream>
+
 namespace PrimFit {
-    typedef double FLOAT;
-    typedef Eigen::Matrix<FLOAT, Eigen::Dynamic, 3> MatX3f;
-    typedef Eigen::Matrix<int, Eigen::Dynamic, 3> MatX3i;
-    typedef Eigen::Matrix<int, Eigen::Dynamic, 2> MatX2i;
-    typedef Eigen::Matrix<int, 2, Eigen::Dynamic> RowMatX2i;
-    typedef Eigen::Matrix<int, Eigen::Dynamic, 1> VecXi;
-    typedef Eigen::Matrix<int, 1, Eigen::Dynamic> RowVecXi;
-    typedef Eigen::Matrix<FLOAT, Eigen::Dynamic, 1> VecXf;
-    typedef Eigen::Matrix<FLOAT, 1, Eigen::Dynamic> RowVecXf;
-    typedef Eigen::Matrix<FLOAT, 3, 1> Vec3f;
-
-    struct PF_Mesh {
-        MatX3f V;
-        MatX3i F;
+    struct Mesh {
+        Eigen::MatrixXd V;
+        Eigen::MatrixXi F;
     };
 
-    class BBox {
-    public:
-        BBox() = default;
-        ~BBox() = default;
+    const Mesh bbox_mesh(const Eigen::Vector3d& minn,
+                          const Eigen::Vector3d& maxx,
+                          double eps = 0.01,
+                          int div = 5) {
+        double len = (maxx - minn).norm() * eps;
+        double xmin = minn.x() - len;
+        double xmax = maxx.x() + len;
+        double xstep = (xmax - xmin) / div;
 
-        Vec3f bbox_min;
-        Vec3f bbox_max;
+        double ymin = minn.y() - len;
+        double ymax = maxx.y() + len;
+        double ystep = (ymax - ymin) / div;
 
-        double get_bbox_area() const {
-            double dx = fabs(bbox_max.x() - bbox_min.x());
-            double dy = fabs(bbox_max.y() - bbox_min.y());
-            double dz = fabs(bbox_max.z() - bbox_min.z());
-            return 2 * (dx*dy + dx*dz + dy*dz);
+        double zmin = minn.x() - len;
+        double zmax = maxx.y() + len;
+        double zstep = (zmax - zmin) / div;
+
+        std::vector<Eigen::Vector3d> points;
+        for(int i = 0; i <= div; i++) {
+            for(int j = 0; j <= div; j++) {
+                for(int k = 0; k <= div; k++) {
+                    if(i == 0 || i == div || j == 0 || j == div || k == 0 || k == div)
+                        points.emplace_back(Eigen::Vector3d(xmin + i * xstep, ymin + j * ystep, zmin + k * zstep));
+                }
+            }
         }
-    };
+
+        Mesh bbox;
+        bbox.V.resize(points.size(), 3);
+
+        std::cout << points.size() << std::endl;
+
+        for(size_t i = 0; i < points.size(); i++) {
+            bbox.V(i,0) = points[i].x();
+            bbox.V(i,1) = points[i].y();
+            bbox.V(i,2) = points[i].z();
+        }
+
+        return bbox;
+
+    }
+
+
 }
 #endif //PRIMFIT_BASE_H
