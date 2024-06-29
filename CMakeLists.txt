@@ -15,7 +15,9 @@ find_package(libigl CONFIG REQUIRED)
 
 
 
-add_executable(main src/main.cpp)
+add_executable(main src/main.cpp
+        src/base.h)
+target_include_directories(main PUBLIC src)
 target_link_libraries(main PUBLIC igl::igl_core)
 
 
