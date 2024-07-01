@@ -275,5 +275,9 @@ namespace PrimFit {
         return cylinder;
 
     }
+
+    Mesh cone_mesh(const Eigen::Vector3d& pos, const Eigen::Vector3d& dir, double len, int div1 = 30, int div2 = 10) {
+
+    }
 }
 #endif //PRIMFIT_BASE_H
