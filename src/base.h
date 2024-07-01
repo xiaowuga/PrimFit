@@ -152,8 +152,8 @@ namespace PrimFit {
     Mesh bbox_mesh(const Eigen::MatrixXd& V, int div = 10, double eps = 0.01) {
         Eigen::Vector3d minn = V.colwise().minCoeff();
         Eigen::Vector3d maxx = V.colwise().maxCoeff();
-        std::cout << minn << std::endl;
-        std::cout << maxx << std::endl;
+//        std::cout << minn << std::endl;
+//        std::cout << maxx << std::endl;
         return bbox_mesh(minn, maxx, div, eps);
     }
 
@@ -216,5 +216,64 @@ namespace PrimFit {
         return plane;
     }
 
+    Mesh cylinder_mesh(const Eigen::Vector3d& pos, const Eigen::Vector3d& dir, double radius, double len, int div1 = 30, int div2 = 10) {
+        Eigen::Vector3d aix1;
+        if(std::abs(dir.x()) < std::abs(dir.y()) && std::abs(dir.x()) < std::abs(dir.z())) {
+            aix1 = Eigen::Vector3d(1,0,0);
+        } else if(std::abs(dir.y()) < std::abs(dir.z())) {
+            aix1 = Eigen::Vector3d(0,1,0);
+        } else {
+            aix1 = Eigen::Vector3d(0,0,1);
+        }
+
+        aix1 = dir.cross(aix1).normalized();
+        Eigen::Vector3d aix2 = dir.cross(aix1).normalized();
+
+        Eigen::Vector3d minn = pos - len * dir;
+
+        double step = len * 2 / div2;
+
+        std::vector<Eigen::Vector3d> points;
+
+        for(int i = 0; i <= div2; i++) {
+            Eigen::Vector3d p = minn + i * step * dir;
+            for(int j = 0; j < div1; j++) {
+                points.emplace_back(p + radius * cos(j * 2 * EIGEN_PI / div1) * aix1
+                                      + radius * sin(j * 2 * EIGEN_PI / div1) * aix2);
+            }
+        }
+
+        std::vector<Eigen::Vector3i> faces;
+
+        for(int i = 0; i < div2; i++) {
+            for(int j = 0; j < div1; j++) {
+                int a = i * div1 + j;
+                int b = i * div1 + (j + 1) % div1;
+                int c = (i + 1) * div1 + j;
+                int d = (i + 1) * div1 + (j + 1) % div1;
+                faces.emplace_back(Eigen::Vector3i(a, b, d));
+                faces.emplace_back(Eigen::Vector3i(a, d, c));
+            }
+        }
+
+        Mesh cylinder;
+        cylinder.V.resize(points.size(), 3);
+
+        for(size_t i = 0; i < points.size(); i++) {
+            cylinder.V(i,0) = points[i].x();
+            cylinder.V(i,1) = points[i].y();
+            cylinder.V(i,2) = points[i].z();
+        }
+        cylinder.F.resize(faces.size(), 3);
+
+        for(size_t i = 0; i < faces.size(); i++) {
+            cylinder.F(i, 0) = faces[i].x();
+            cylinder.F(i, 1) = faces[i].y();
+            cylinder.F(i, 2) = faces[i].z();
+        }
+
+        return cylinder;
+
+    }
 }
 #endif //PRIMFIT_BASE_H

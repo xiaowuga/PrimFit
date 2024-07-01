@@ -23,10 +23,10 @@ int main() {
     int div = 5;
 
     Vector3d dir(0,0,1);
-    Mesh plane = plane_mesh(p1, dir,2, 10);
+    Mesh cylinder = cylinder_mesh(p1, dir, 1.0, 1.0);
 
-    igl::writePLY("../out.ply", plane.V, plane.F);
-    std::cout << plane.V << std::endl;
-    std::cout << plane.F << std::endl;
+    igl::writePLY("../out.ply", cylinder.V, cylinder.F);
+//    std::cout << plane.V << std::endl;
+//    std::cout << plane.F << std::endl;
     return 0;
 }
