@@ -23,9 +23,9 @@ int main() {
     int div = 5;
 
     Vector3d dir(0,0,1);
-    Mesh cylinder = cylinder_mesh(p1, dir, 1.0, 1.0);
-
-    igl::writePLY("../out.ply", cylinder.V, cylinder.F);
+//    Mesh cylinder = cone_mesh(p1, dir, 1.0, EIGEN_PI / 3, 1.0);
+    Mesh sphere = torus_mesh(p1, dir, 3.0, 1.0);
+    igl::writePLY("../out.ply", sphere.V, sphere.F);
 //    std::cout << plane.V << std::endl;
 //    std::cout << plane.F << std::endl;
     return 0;

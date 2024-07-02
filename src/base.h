@@ -276,8 +276,178 @@ namespace PrimFit {
 
     }
 
-    Mesh cone_mesh(const Eigen::Vector3d& pos, const Eigen::Vector3d& dir, double len, int div1 = 30, int div2 = 10) {
+    Mesh cone_mesh(const Eigen::Vector3d& pos, const Eigen::Vector3d& dir, double angle, double len, int div1 = 30, int div2 = 10) {
+        Eigen::Vector3d aix1;
+        if(std::abs(dir.x()) < std::abs(dir.y()) && std::abs(dir.x()) < std::abs(dir.z())) {
+            aix1 = Eigen::Vector3d(1,0,0);
+        } else if(std::abs(dir.y()) < std::abs(dir.z())) {
+            aix1 = Eigen::Vector3d(0,1,0);
+        } else {
+            aix1 = Eigen::Vector3d(0,0,1);
+        }
 
+        Eigen::Vector3d aix2 = dir.cross(aix1).normalized();
+
+        std::vector<Eigen::Vector3d> points(div1 * div2 + 1);
+        for(int i = 0; i < div2; i++) {
+            Eigen::Vector3d center = pos + (1.0 * len * (i +  1) / div2) * dir;
+            double r = std::abs(1.0 * len * (i + 1) / div2 * tan(angle));
+            for(int j = 0; j < div1; j++) {
+                points[i * div1 + j] = center + r * cos(-j * 2 * EIGEN_PI / div1) * aix1
+                                              + r * sin(-j * 2 * EIGEN_PI / div1) * aix2;
+            }
+        }
+        points[div1 * div2] = pos;
+
+        std::vector<Eigen::Vector3i> faces;
+
+        for(int i = 0; i < div1; i++) {
+            faces.emplace_back(Eigen::Vector3i(div1 * div2, i,  (i +1) % div1));
+        }
+
+        for(int i = 0; i < div2 - 1; i++) {
+            for(int j = 0; j < div1; j++) {
+                faces.emplace_back(Eigen::Vector3i(j + div1 * i, j + div1 * (i + 1), (j + 1) % div1 + div1 * i));
+                faces.emplace_back(Eigen::Vector3i((j + 1) % div1 + div1 * i, j + div1 * (i + 1), (j + 1) % div1 + div1 * (i + 1)));
+            }
+        }
+
+
+        Mesh cone;
+        cone.V.resize(points.size(), 3);
+
+        for(size_t i = 0; i < points.size(); i++) {
+            cone.V(i,0) = points[i].x();
+            cone.V(i,1) = points[i].y();
+            cone.V(i,2) = points[i].z();
+        }
+        cone.F.resize(faces.size(), 3);
+
+        for(size_t i = 0; i < faces.size(); i++) {
+            cone.F(i, 0) = faces[i].x();
+            cone.F(i, 1) = faces[i].y();
+            cone.F(i, 2) = faces[i].z();
+        }
+
+        return cone;
+    }
+
+
+    Mesh sphere_mesh(const Eigen::Vector3d& pos, double radius, int n_latitude = 30, int n_longitude = 30) {
+        std::vector<Eigen::Vector3d> points((2*n_longitude-1)*n_latitude+2);
+
+        double latitude_delta = 2 * EIGEN_PI / n_latitude;
+        double longtitude_delta = EIGEN_PI / (2 * n_longitude);
+
+        for (int i = 1; i < 2*n_longitude; ++i) {
+            double longtitude_angle = -EIGEN_PI/2 + i * longtitude_delta;
+            for (int j = 0; j < n_latitude; ++j) {
+                double latitude_angle = j * latitude_delta;
+                points[(i-1)*n_latitude + j] = pos + Eigen::Vector3d(cos(longtitude_angle) * cos(latitude_angle),
+                                                    cos(longtitude_angle) * sin(latitude_angle),
+                                                    sin(longtitude_angle)) * radius;
+            }
+        }
+
+        int south_pole = (2*n_longitude-1)*n_latitude;
+        points[south_pole] =  pos + Eigen::Vector3d(0, 0, -1) * radius;
+        int north_pole = (2*n_longitude-1)*n_latitude + 1;
+        points[north_pole] = pos + Eigen::Vector3d(0, 0, 1) * radius;
+
+
+        std::vector<Eigen::Vector3i> faces;
+        for (int i = 1; i < 2*n_longitude-1; ++i) {
+            for (int j = 0; j < n_latitude; ++j) {
+                int idx1 = 3 * ((i-1)*2*n_latitude + j);
+                faces.emplace_back(Eigen::Vector3i((i-1)*n_latitude+j, (i-1)*n_latitude + (j+1)%n_latitude, i*n_latitude+j));
+                faces.emplace_back(Eigen::Vector3i(i*n_latitude+j, (i-1)*n_latitude + (j+1)%n_latitude, i*n_latitude + (j+1)%n_latitude));
+            }
+        }
+
+        for (int j = 0; j < n_latitude; ++j) {
+            int idx = 3 * ((2*n_longitude-2)*2*n_latitude + j);
+            faces.emplace_back(Eigen::Vector3i(j, south_pole, (j+1)%n_latitude));
+        }
+
+        for (int j = 0; j < n_latitude; ++j) {
+            int idx = 3 * ((2*n_longitude-2)*2*n_latitude + n_latitude + j);
+            faces.emplace_back(Eigen::Vector3i(north_pole, (2*n_longitude-2)*n_latitude + j, (2*n_longitude-2)*n_latitude + (j+1)%n_latitude));
+        }
+
+        Mesh sphere;
+        sphere.V.resize(points.size(), 3);
+
+        for(size_t i = 0; i < points.size(); i++) {
+            sphere.V(i,0) = points[i].x();
+            sphere.V(i,1) = points[i].y();
+            sphere.V(i,2) = points[i].z();
+        }
+        sphere.F.resize(faces.size(), 3);
+
+        for(size_t i = 0; i < faces.size(); i++) {
+            sphere.F(i, 0) = faces[i].x();
+            sphere.F(i, 1) = faces[i].y();
+            sphere.F(i, 2) = faces[i].z();
+        }
+
+        return sphere;
+
+    }
+
+    Mesh torus_mesh(const Eigen::Vector3d& pos, const Eigen::Vector3d& dir, double major_radius, double minor_radius, int n_major = 60, int n_minor = 30) {
+
+        Eigen::Vector3d aix1;
+        if(std::abs(dir.x()) < std::abs(dir.y()) && std::abs(dir.x()) < std::abs(dir.z())) {
+            aix1 = Eigen::Vector3d(1,0,0);
+        } else if(std::abs(dir.y()) < std::abs(dir.z())) {
+            aix1 = Eigen::Vector3d(0,1,0);
+        } else {
+            aix1 = Eigen::Vector3d(0,0,1);
+        }
+
+        aix1 = dir.cross(aix1).normalized();
+        Eigen::Vector3d aix2 = dir.cross(aix1).normalized();
+        std::vector<Eigen::Vector3d> points(n_major * n_minor);
+
+        for(int i = 0; i < n_major; ++i) {
+            Eigen::Vector3d m_center = pos + major_radius * cos(i*2* EIGEN_PI / n_major) * aix1
+                                    + major_radius * sin(i * 2 * EIGEN_PI / n_major) * aix2;
+
+            Eigen::Vector3d m_axis = (m_center - pos);
+            m_axis.normalize();
+            for(int j = 0; j < n_minor; ++j) {
+                points[i * n_minor + j] = m_center
+                                          + minor_radius * cos(j * 2 * EIGEN_PI / n_minor) * m_axis
+                                          + minor_radius * sin(j * 2 * EIGEN_PI / n_minor) * dir;
+            }
+        }
+
+        std::vector<Eigen::Vector3i> faces;
+        for(int i = 0; i < n_major; ++i) {
+            for(int j = 0; j < n_minor; ++j) {
+                faces.emplace_back(Eigen::Vector3i(i*n_minor+((j+1)%n_minor), i*n_minor+j, ((i+1)%n_major)*n_minor+j));
+
+                faces.emplace_back(Eigen::Vector3i(((i+1)%n_major)*n_minor+((j+1)%n_minor),i*n_minor+((j+1)%n_minor), ((i+1)%n_major)*n_minor+j));
+            }
+        }
+
+        Mesh torus;
+        torus.V.resize(points.size(), 3);
+
+        for(size_t i = 0; i < points.size(); i++) {
+            torus.V(i,0) = points[i].x();
+            torus.V(i,1) = points[i].y();
+            torus.V(i,2) = points[i].z();
+        }
+        torus.F.resize(faces.size(), 3);
+
+        for(size_t i = 0; i < faces.size(); i++) {
+            torus.F(i, 0) = faces[i].x();
+            torus.F(i, 1) = faces[i].y();
+            torus.F(i, 2) = faces[i].z();
+        }
+
+        return torus;
     }
 }
 #endif //PRIMFIT_BASE_H
