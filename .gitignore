@@ -8,3 +8,4 @@ cmake-build-relwithdebinfo-visual-studio/
 arrangement/
 src/test_unique_edge_map.cpp
 src/test_mesh_boolean.cpp
+src/test_ransac.cpp

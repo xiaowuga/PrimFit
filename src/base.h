@@ -152,8 +152,6 @@ namespace PrimFit {
     Mesh bbox_mesh(const Eigen::MatrixXd& V, int div = 10, double eps = 0.01) {
         Eigen::Vector3d minn = V.colwise().minCoeff();
         Eigen::Vector3d maxx = V.colwise().maxCoeff();
-//        std::cout << minn << std::endl;
-//        std::cout << maxx << std::endl;
         return bbox_mesh(minn, maxx, div, eps);
     }
 
