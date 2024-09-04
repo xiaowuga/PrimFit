@@ -18,7 +18,8 @@ find_package(libigl CONFIG REQUIRED)
 
 add_executable(main src/main.cpp
         src/mesh_boolean.h
-        src/mesh_boolean.cpp)
+        src/mesh_boolean.cpp
+        src/point_set.cpp)
 target_include_directories(main PUBLIC src)
 target_link_libraries(main PRIVATE Eigen3::Eigen)
 target_link_libraries(main PRIVATE CGAL::CGAL)

@@ -4,7 +4,7 @@
 #include <base.h>
 
 #include <igl/writePLY.h>
-
+#include <point_set.h>
 using namespace Eigen;
 using namespace PrimFit;
 
