@@ -3,3 +3,5 @@
 3rd_scip/**​ linguist-vendored
 3rd_soplex/**​ linguist-vendored
 data/**​ linguist-vendored
+*.h linguist-language=C++
+*.c linguist-language=C++
