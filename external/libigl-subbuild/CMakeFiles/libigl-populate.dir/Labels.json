@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/CMakeFiles/libigl-populate"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/CMakeFiles/libigl-populate.rule"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/CMakeFiles/libigl-populate-complete.rule"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/libigl-populate-prefix/src/libigl-populate-stamp/libigl-populate-build.rule"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/libigl-populate-prefix/src/libigl-populate-stamp/libigl-populate-configure.rule"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/libigl-populate-prefix/src/libigl-populate-stamp/libigl-populate-download.rule"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/libigl-populate-prefix/src/libigl-populate-stamp/libigl-populate-install.rule"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/libigl-populate-prefix/src/libigl-populate-stamp/libigl-populate-mkdir.rule"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/libigl-populate-prefix/src/libigl-populate-stamp/libigl-populate-patch.rule"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/libigl-populate-prefix/src/libigl-populate-stamp/libigl-populate-test.rule"
+		},
+		{
+			"file" : "D:/code/PrimFit/external/libigl-subbuild/libigl-populate-prefix/src/libigl-populate-stamp/libigl-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"libigl-populate"
+		],
+		"name" : "libigl-populate"
+	}
+}

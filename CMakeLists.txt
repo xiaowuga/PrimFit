@@ -1,41 +1,97 @@
-cmake_minimum_required(VERSION 3.20)
-
+cmake_minimum_required(VERSION 3.1)
 project(PrimFit)
 
-set(CMAKE_CXX_STANDARD 17)
+#if(DEFINED ENV{VCPKG_DIR})
+#    set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake
+#            CACHE STRING "Vcpkg toolchain file")
+#endif()
 
-find_package(OpenMP REQUIRED)
-if(OpenMP_CXX_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+set(CMAKE_CXX_STANDARD 11)
 
-add_subdirectory(ransac)
-add_subdirectory(scip)
+#SET(Easy3d_DIR /Users/xiaowuga/Desktop/algo/Easy3D/build)
+find_package(Easy3d CONFIG REQUIRED)
 
+# Eigen3
 find_package(Eigen3 CONFIG REQUIRED)
-find_package(CGAL CONFIG REQUIRED)
-find_package(libigl CONFIG REQUIRED)
 
-add_executable(main src/main.cpp
-        src/mesh_boolean.h
-        src/mesh_boolean.cpp
-        src/point_set.cpp)
-target_include_directories(main PUBLIC src)
-target_link_libraries(main PRIVATE Eigen3::Eigen)
-target_link_libraries(main PRIVATE CGAL::CGAL)
-target_link_libraries(main PRIVATE igl::igl_core igl_copyleft::igl_copyleft_core igl_copyleft::igl_copyleft_cgal)
+# CGAL
+#find_package(CGAL CONFIG REQUIRED)
 
-add_executable(test_ransac src/test_ransac.cpp)
-target_include_directories(test_ransac PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ransac)
-target_link_libraries(test_ransac PUBLIC ransac)
+#Libigl
+#find_package(libigl CONFIG REQUIRED)
 
-#add_executable(test_unique_edge src/test_unique_edge_map.cpp)
-#target_link_libraries(test_unique_edge PRIVATE Eigen3::Eigen)
-#target_link_libraries(test_unique_edge PRIVATE CGAL::CGAL)
-#target_link_libraries(test_unique_edge PRIVATE igl::igl_core igl_copyleft::igl_copyleft_core igl_copyleft::igl_copyleft_cgal)
+option(FETCHCONTENT_FULLY_DISCONNECTED   "Disables all attempts to download or update content and assumes source dirs already exist" OFF)
+set(FETCHCONTENT_BASE_DIR "${CMAKE_SOURCE_DIR}/external" CACHE PATH "Directory under which to collect all populated content")
 
 
-#add_executable(test_mesh_boolean src/test_mesh_boolean.cpp src/mesh_boolean.cpp src/mesh_boolean.h)
-#target_link_libraries(test_mesh_boolean PRIVATE Eigen3::Eigen)
-#target_link_libraries(test_mesh_boolean PRIVATE CGAL::CGAL)
-#target_link_libraries(test_mesh_boolean PRIVATE igl::igl_core igl_copyleft::igl_copyleft_core igl_copyleft::igl_copyleft_cgal)
+#include(FetchContent)
+#set(LIBIGL_WITH_EMBREE On)
+#set(LIBIGL_WITH_CGAL On)
+option(LIBIGL_WITH_EMBREE "Build Embree support in libigl" On)
+option(LIBIGL_WITH_CGAL "Build CGAL support in libigl" On)
+
+include(cmake/libigl.cmake)
+#include(cmake/FindGMP.cmake)
+
+
+### Configuration
+set(QUADFIT_ROOT         ${CMAKE_CURRENT_LIST_DIR})
+
+set(QUADFIT_glpk_DIR                ${QUADFIT_ROOT}/3rd_glpk)
+set(QUADFIT_lpsolve_DIR             ${QUADFIT_ROOT}/3rd_lpsolve)
+set(QUADFIT_scip_DIR                ${QUADFIT_ROOT}/3rd_scip)
+set(QUADFIT_soplex_DIR              ${QUADFIT_ROOT}/3rd_soplex)
+
+
+add_subdirectory(3rd_glpk)
+add_subdirectory(3rd_lpsolve)
+add_subdirectory(3rd_scip)
+add_subdirectory(3rd_soplex)
+
+add_subdirectory(lp)
+add_subdirectory(arrangement)
+add_subdirectory(quadrics)
+add_subdirectory(algo)
+add_subdirectory(io)
+#add_subdirectory(gui)
+
+add_executable(merge_step cli/merge_step_cli.cpp)
+target_link_libraries(merge_step PUBLIC algo io)
+
+add_executable(arrangement_step cli/arrangement_step_cli.cpp)
+target_link_libraries(arrangement_step PUBLIC algo io arrangement)
+
+
+add_executable(grow_step cli/grow_step_cli.cpp)
+target_link_libraries(grow_step PUBLIC algo io)
+
+
+add_executable(pblp_step cli/pblp_step_cli.cpp)
+target_link_libraries(pblp_step PUBLIC algo io)
+
+add_executable(comfirm_seg cli/comfirm_seg.cpp)
+target_link_libraries(comfirm_seg PUBLIC algo io)
+
+
+add_executable(comfirm_merge cli/comfirm_merge.cpp)
+target_link_libraries(comfirm_merge PUBLIC algo io)
+
+add_executable(comfirm_arrangement cli/comfirm_arrangement.cpp)
+target_link_libraries(comfirm_arrangement PUBLIC algo io)
+
+add_executable(comfirm_grow cli/comfirm_grow.cpp)
+target_link_libraries(comfirm_grow PUBLIC algo io)
+
+add_executable(remian_patch_valid_area cli/remian_patch_valid_area.cpp)
+target_link_libraries(remian_patch_valid_area PUBLIC algo io)
+
+add_executable(comfirm_curve cli/comfirm_curve.cpp)
+target_link_libraries(comfirm_curve PUBLIC algo io)
+
+
+add_executable(batch_pblp_step_cli cli/batch_pblp_step_cli.cpp)
+target_link_libraries(batch_pblp_step_cli PUBLIC algo io easy3d::util)
+
+add_executable(primfit_cli cli/primfit_cli.cpp)
+target_link_libraries(primfit_cli PUBLIC io algo easy3d::fileio )
+

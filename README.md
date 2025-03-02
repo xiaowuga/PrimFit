@@ -6,13 +6,28 @@
 
 **PrimFit** is the implementation of reconstruction method described in  paper “**Structure–Aware Surface Reconstruction via Primitive Assembly**”.
 
-I will release the code before July 2024.I apologize for the delay.
 
-In this paper, we extend the hypothesis and selection idea of plane-baed surface reconstruction method, [PolyFit](https://github.com/LiangliangNan/PolyFit) , to multi-type primitives and introduce an effective pruning mechanism to speed up extraction step (selection) significantly.
+## Platform
+- Windows 11
+- CLion2024.1.2 +  Visual Stdio 2022
+- Intel(R) Core i9-13900K
 
-## Code
+## Dependence
 
-Currently, I am refactoring the code, and it will be available soon. I will upload all the code during winter vacation.
+The dependent libraries of our code includes:
+- Eigen3 (3.4.0 or later)
+- Easy3D (2.5.2 or later), Please visit the [Prof.Nan's repository](https://github.com/LiangliangNan/Easy3D) to obtain it and follow the instructions for installation.
+- libigl, A special version, and automatically obtained through the `FetchContent` function in CMake. Ensure the stability of your VPN if you are in mainland China.
+
+
+
+## Build & Usage
+
+After successfully configuring all the required dependent libraries, you can proceed to run the example. To do so, simply modify the string variables `input_path` (in .seg format) and `output_path` (in .obj format) in the `cli/primfit_cli.cpp` file. 
+Once the paths are updated, execute the target `primfit_cli.exe` to test our algorithm.
+
+The .seg format is our custom format. 
+The folder `data/sub_abc_seg` provides 40 .seg files for testing; `data/sub_abc_ours` contains our test results; and `data/sub_abc_xyz` holds the original test point cloud files.
 
 ## Citation
 If you make use of our work, please cite our paper:
@@ -32,7 +47,7 @@ This work was partially funded by the National Key Research and Development Prog
 
 Our code is inspired the works of [BSH](https://github.com/duxingyi-charles/Boundary_Sampled_Halfspaces), [PolyFit](https://github.com/LiangliangNan/PolyFit) and [KSR](https://www-sop.inria.fr/members/Florent.Lafarge/code/KSR.zip). We would like to thank Dr. [Xingyi Du](https://duxingyi-charles.github.io/) and Prof. [Liangliang Nan](https://3d.bk.tudelft.nl/liangliang/) for their excellent code.
 
-Furthermore, we are grateful to Jiahui Lv from Shenzhen University for his valuable advice in this work. 
+Furthermore, we are grateful to Jiahui Lv from Shenzhen University for his valuable advice in this work.
 
 ## Maintaince
 
