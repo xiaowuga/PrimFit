@@ -9,7 +9,7 @@
 //
 
 #include <util.h>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <cmath>
 
 namespace QuadFit {
