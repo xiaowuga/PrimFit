@@ -4,8 +4,9 @@ cmake-build-release-visual-studio/
 cmake-build-release/
 cmake-build-debug/
 external/
-external.zip
-PrimFit_Windows_Release_v1.0.zip
-SegGen/
 PrimFit_Windows_Release_v1.0/
 data/subset_abc_xyz/
+SegGen/
+external.zip
+
+PrimFit_Windows_Release_v1.0.zip
