@@ -12,7 +12,8 @@
 #include <linear_program_solver.h>
 #include <easy3d/fileio/surface_mesh_io.h>
 #include <igl/writeOBJ.h>
-
+#include <CLI/CLI.hpp>
+#include <nlohmann/json.hpp>
 
 void merge_step(std::vector<int>& in_type, std::vector<easy3d::vec3>& in_pos
                 ,std::vector<easy3d::vec3>& in_dir,  std::vector<float>& in_r1
@@ -26,17 +27,14 @@ void merge_step(std::vector<int>& in_type, std::vector<easy3d::vec3>& in_pos
                 ,std::vector<easy3d::vec3>& out_colors,  std::vector<std::vector<easy3d::vec3>>& proxy_points
                 ,std::vector<std::vector<int>>& proxy_indices,std::vector<easy3d::vec3>& arr_points
                 ,std::vector<int>& arr_indices, std::vector<int>& arr_patches, std::vector<int>& arr_labels
-                ,std::vector<int>& arr_cells) {
+                ,std::vector<int>& arr_cells,  float normal_angle, float dis_eps) {
     std::vector<PrimFit::SurfacePrimitive*> shapes;
     PrimFit::Util::construct_SurfacePrimitive_from_std(shapes,
                                                        in_type, in_pos, in_dir, in_r1,in_r2, in_colors);
     std::vector<PrimFit::SurfacePrimitive*> shapes_merged;
     out_segments.clear();
-    PrimFit::Primitive_Merger primitiveMerger(10, 0.001);
+    PrimFit::Primitive_Merger primitiveMerger(normal_angle, dis_eps);
     std::vector<std::vector<int>> merge_pair;
-    merge_pair.push_back({28, 32});
-    merge_pair.push_back({5, 21});
-    merge_pair.push_back({5, 22});
     out_segments.clear();
     primitiveMerger.merge_primitves(shapes, shapes_merged, in_points, in_normal, in_segments
             , out_segments, merge_pair);
@@ -121,7 +119,7 @@ void grow_step(int& step
         ,std::vector<float>& out_face_valid_area
         ,std::vector<float>& out_face_area
         ,std::vector<easy3d::vec3>& out_face_colors
-        ,std::vector<int>& out_patch_label) {
+        ,std::vector<int>& out_patch_label, float coverage) {
     MatrixDr m_vertives;
     MatrixIr m_faces;
     VectorI m_face_labels;
@@ -138,7 +136,7 @@ void grow_step(int& step
     PrimFit::Partition_Simplifier3 ps;
     ps.init(m_points, m_vertives, m_faces
             , m_patches, m_face_labels,in_segments, 0.02);
-    ps.simplify(0.5);
+    ps.simplify(coverage);
 
     VectorI m_face_point_num = ps.m_face_point_num;
     VectorD m_face_fit = ps.m_face_fit;
@@ -188,7 +186,8 @@ void pblp_step(std::vector<easy3d::vec3>& face_vertices
         ,std::vector<easy3d::vec3>& face_colors
         ,std::vector<int>& patch_label
         ,MatrixDr& m_out_vertives
-        ,MatrixIr& m_out_faces) {
+        ,MatrixIr& m_out_faces
+        ,float lamdba) {
     MatrixDr m_vertives;
     MatrixIr m_faces;
     VectorI m_face_labels;
@@ -208,7 +207,7 @@ void pblp_step(std::vector<easy3d::vec3>& face_vertices
             ,face_point_num, face_fit, face_valid_area
             ,face_area, face_colors, patch_label);
     PrimFit::PBLP pblp;
-    double para1 = 0.9, para2 = 0.9, para3 = 0.2;
+    double para1 = 1.0, para2 = 1.0, para3 = lamdba;
     pblp.init(m_vertives, m_faces
             ,m_face_labels, m_face_patches
             ,m_face_point_num,m_face_fit
@@ -221,9 +220,29 @@ void pblp_step(std::vector<easy3d::vec3>& face_vertices
 }
 
 
-int main() {
-    std::string input_path = "D:\\code\\PrimFit\\data\\sculpt_refine.seg";
-    std::string output_path = "D:\\code\\PrimFit\\data\\sculpt_output.obj";
+int main(int argc, char **argv) {
+    std::string config_path;
+    CLI::App app{"DEFILLET Command Line"};
+
+    app.add_option("-c,--config", config_path, "Configure file")->required();
+
+    CLI11_PARSE(app, argc, argv);
+    using json = nlohmann::json;
+    std::ifstream file(config_path);
+    json j;
+    file >> j;
+    std::string input_path = j["input_path"];
+    std::string output_path = j["output_path"];
+    float normal_angle = j["normal_angle"];
+    float dis_eps = j["dis_eps"];
+    float coverage = j["coverage"];
+    float lamdba = j["lamdba"];
+    std::cout << "input_path = " << input_path << std::endl;
+    std::cout << "output_path = " << output_path << std::endl;
+    std::cout << "normal_angle = " << normal_angle << std::endl;
+    std::cout << "dis_eps = " << dis_eps << std::endl;
+    std::cout << "coverage = " << coverage << std::endl;
+    std::cout << "lamdba = " << lamdba << std::endl;
     std::vector<int> in_type;
     std::vector<easy3d::vec3> in_pos;
     std::vector<easy3d::vec3> in_dir;
@@ -255,7 +274,7 @@ int main() {
     std::vector<int> arr_cells;
     merge_step(in_type, in_pos, in_dir, in_r1, in_r2, in_points, in_normals, in_segments, in_colors
                ,out_step, out_type,out_pos, out_dir, out_r1, out_r2, out_points, out_normals, out_segments, out_colors
-               ,proxy_points, proxy_indices, arr_points,arr_indices, arr_patches, arr_labels, arr_cells);
+               ,proxy_points, proxy_indices, arr_points,arr_indices, arr_patches, arr_labels, arr_cells, normal_angle, dis_eps);
 
     arrangement_step(out_step, out_type,out_pos, out_dir, out_r1, out_r2, out_points, out_normals, out_segments, out_colors
             ,proxy_points, proxy_indices, arr_points,arr_indices, arr_patches, arr_labels, arr_cells);
@@ -273,7 +292,7 @@ int main() {
     grow_step(out_step, out_type,out_pos, out_dir, out_r1, out_r2, out_points, out_normals, out_segments, out_colors
             ,proxy_points, proxy_indices, arr_points,arr_indices, arr_patches, arr_labels, arr_cells
             ,out_face_vertices, out_face_indices, out_face_label, out_face_patch, out_face_point_num
-            ,out_face_fit, out_face_valid_area, out_face_area, out_face_colors, out_patch_label);
+            ,out_face_fit, out_face_valid_area, out_face_area, out_face_colors, out_patch_label,coverage);
 
     std::vector<easy3d::vec3> out_mesh_points;
     std::vector<int> out_mesh_indices;
@@ -281,8 +300,8 @@ int main() {
     MatrixIr m_out_faces;
     pblp_step(out_face_vertices, out_face_indices, out_face_label, out_face_patch
             ,out_face_point_num, out_face_fit, out_face_valid_area, out_face_area
-            ,out_face_colors, out_patch_label, m_out_vertives, m_out_faces);
+            ,out_face_colors, out_patch_label, m_out_vertives, m_out_faces, lamdba);
     igl::writeOBJ(output_path, m_out_vertives, m_out_faces);
-    
+
     return 0;
 }

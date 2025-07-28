@@ -1,0 +1,8 @@
+{
+  "input_path": "D:\\code\\PrimFit\\data\\sculpt.seg",
+  "output_path": "D:\\code\\PrimFit\\data\\sculpt_output.obj",
+  "normal_angle": 10,
+  "dis_eps" : 0.001,
+  "coverage" : 0.5,
+  "lamdba" : 0.2
+}

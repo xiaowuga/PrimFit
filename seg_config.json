@@ -1,0 +1,14 @@
+{
+  "input_path": "D:\\code\\PrimFit\\data\\subset_abc_ply\\00863732_1_10000.ply",
+  "output_path": "D:\\code\\PrimFit\\data\\00863732_1_10000.seg",
+  "m_minSupport": 20,
+  "m_epsilon" : 0.004,
+  "m_bitmapEpsilon" : 0.02,
+  "m_normalThresh" : 0.8,
+  "m_probability" : 0.001,
+  "use_plane": true,
+  "use_cylinder": false,
+  "use_sphere": false,
+  "use_cone": false,
+  "use_torus": false
+}
