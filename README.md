@@ -6,6 +6,7 @@
 
 **PrimFit** is the implementation of reconstruction method described in  paper “**Structure–Aware Surface Reconstruction via Primitive Assembly**”.
 
+<span style="color:red; font-weight:bold;">Windows executable files released — feel free to try our method.</span>
 
 ## Platform
 - Windows 11
