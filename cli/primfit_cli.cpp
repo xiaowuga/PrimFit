@@ -8,9 +8,9 @@
 #include <util.h>
 #include <Arrangement.h>
 #include <mesh_generater.h>
-#include <partition_simplifier3.h>
+#include <partition_simplifier.h>
 #include <linear_program_solver.h>
-#include <easy3d/fileio/surface_mesh_io.h>
+
 #include <igl/writeOBJ.h>
 #include <CLI/CLI.hpp>
 #include <nlohmann/json.hpp>

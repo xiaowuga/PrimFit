@@ -14,7 +14,7 @@
 #include <igl/writeOBJ.h>
 #include <easy3d/util/stop_watch.h>
 namespace PrimFit {
-    void Partition_Simplifier::init(MatrixDr &points_
+    void Partition_Simplifier3::init(MatrixDr &points_
                                     , MatrixDr &m_vertices_
                                     , MatrixIr &m_face_
                                     , VectorI &m_face_patch_
@@ -33,6 +33,13 @@ namespace PrimFit {
         int num_face = m_face.rows();
         int num_seg = segments.size();
 
+        VectorD sqrD;
+        MatrixD C;
+        VectorI index;
+
+        igl::point_mesh_squared_distance(points, m_vertices, m_face_, sqrD, index, C);
+        MatrixD FN;
+        igl::per_face_normals(m_vertices, m_face, FN);
         m_face_point_num = VectorI::Zero(num_face);
         m_face_fit = VectorD::Zero(num_face);
         m_face_valid_area = VectorD::Zero(num_face);
@@ -40,98 +47,46 @@ namespace PrimFit {
         igl::doublearea(m_vertices, m_face, m_face_area);
         m_face_area = m_face_area.array() / 2;
 
-        std::vector<std::vector<int>> seg_face(num_seg);
+        MatrixDr P; P.resize(num_points, 3);
+        MatrixDr PN; PN.resize(num_points, 3);
+        VectorI PF;  PF.resize(num_points);
 
-        for(int i = 0; i < num_face; i++) {
-            int idx = m_face_label[i];
-            seg_face[idx].emplace_back(i);
+        int ct = 0;
+        for(int i = 0; i < num_points; i++) {
+            double dis = sqrt(sqrD[i]);
+            if (dis < eps) {
+                int idx = index[i];
+                m_face_point_num[idx] += 1;
+                m_face_fit[idx] += sqrt(sqrD[i]);
+                P.row(ct) = points.row(i);
+                PN.row(ct) = FN.row(idx);
+                PF[ct] = idx;
+                ct++;
+            }
         }
-        for(int i = 0; i < num_seg; i++) {
-            int num_p = segments[i].size();
-//            std::cout << i << ' ' << num_p <<std::endl;
-            MatrixDr P; P.resize(num_p, 3);
-            for(int j = 0; j < num_p; j++) {
-                int idx = segments[i][j];
-                P.row(j) = points.row(idx);
-            }
-            int ct = 0;
-            std::map<int, int> mp;
-            int num_f = seg_face[i].size();
-            MatrixDr V; V.resize(num_f * 3, 3);
-            MatrixIr F; F.resize(num_f, 3);
-            VectorI FI; FI.resize(num_f);
-            for(int j = 0; j < num_f; j++) {
-                int fidx = seg_face[i][j];
-                for(int k = 0; k < 3; k++) {
-                    int idx = m_face(fidx, k);
-                    if(mp.find(idx) == mp.end()) {
-                        mp[idx] = ct;
-                        V.row(ct) = m_vertices.row(idx);
-                        ct++;
-                    }
-                }
 
-                int x = mp[m_face(fidx, 0)];
-                int y = mp[m_face(fidx, 1)];
-                int z = mp[m_face(fidx, 2)];
-                F.row(j) = Vector3I(x, y, z);
-                FI[j] = fidx;
-            }
-            V.conservativeResize(ct, 3);
-            VectorD sqrD;
-            MatrixD C;
-            VectorI index;
-            igl::point_mesh_squared_distance(P, V, F, sqrD, index, C);
-            MatrixD FN;
-            igl::per_face_normals(V, F, FN);
-//            std::string out_path = "D:\\ICCV2023\\Selected_Fit4CAD\\test\\PC13\\tmp\\" + std::to_string(i) + ".obj";
-//            std::string out_path_cloud = "D:\\ICCV2023\\Selected_Fit4CAD\\test\\PC13\\tmp\\" + std::to_string(i)+"_point1" + ".obj";
-//            igl::writeOBJ(out_path, V, F);
-            MatrixIr asd; asd.resize(0, 3);
+        P.conservativeResize(ct, 3);
+        PN.conservativeResize(ct, 3);
+        PF.conservativeResize(ct);
 
-            MatrixDr rP; rP.resize(num_p, 3);
-            MatrixDr rPN; rPN.resize(num_p, 3);
-            VectorI rPI;  rPI.resize(num_p);
-            ct = 0;
-            for(int j = 0; j < num_p; j++) {
-                double dis = std::sqrt(sqrD[j]);
-                int fid1 = index[j];
-                int fid2 = FI[fid1];
-                if(dis < eps) {
-                    rP.row(ct) = C.row(j);
-                    rPN.row(ct) = FN.row(fid1);
-                    rPI[ct] = fid1;
-                    ct++;
-                    m_face_point_num[fid2]++;
-                    m_face_fit[fid2] += dis;
-                }
-            }
-            int num_rp = ct;
-            rP.conservativeResize(num_rp, 3);
-            rPN.conservativeResize(num_rp, 3);
-            rPI.conservativeResize(num_rp);
+        std::vector<std::vector<int > > O_PI;
+        Eigen::MatrixXi O_CH;
+        Eigen::MatrixXd O_CN;
+        Eigen::VectorXd O_W;
 
-            easy3d::StopWatch w; w.start();
-            std::vector<std::vector<int > > O_PI;
-            Eigen::MatrixXi O_CH;
-            Eigen::MatrixXd O_CN;
-            Eigen::VectorXd O_W;
+        igl::octree(P,O_PI,O_CH,O_CN,O_W);
 
-            igl::octree(rP,O_PI,O_CH,O_CN,O_W);
+        Eigen::VectorXf A;
+        {
+            Eigen::MatrixXi I;
+            igl::knn(points_,8,O_PI,O_CH,O_CN,O_W,I);
+            // CGAL is only used to help get point areas
+            igl::copyleft::cgal::point_areas(P,I,PN,A);
+        }
 
-            Eigen::VectorXf A;
-            {
-                Eigen::MatrixXi I;
-                igl::knn(rP,20,O_PI,O_CH,O_CN,O_W,I);
-                // CGAL is only used to help get point areas
-                igl::copyleft::cgal::point_areas(rP,I,rPN,A);
-            }
-            xx += w.elapsed_seconds(3);
-            for(int j = 0; j < num_rp; j++) {
-                int fid1 = rPI[j];
-                int fid2 = FI[fid1];
-                m_face_valid_area[fid2] += A[j];
-            }
+        for(int i = 0; i < ct; i++) {
+            int idx = PF[i];
+            m_face_valid_area[idx] += A[i];
         }
 
         for(int i = 0; i < num_face; i++) {
@@ -163,16 +118,15 @@ namespace PrimFit {
             }
             edge_map[s][t] = i;
         }
-        std::cout << xx <<std::endl;
         vis = VectorI::Zero(num_face);
         is_init = true;
     }
 
-    double Partition_Simplifier::cover_cost(int fid, int eid) {
-        return m_face_area[fid] * 2 / edge_len[eid];
+    double Partition_Simplifier3::cover_cost(int fid, int eid) {
+        return m_face_area[fid] * 2 / (edge_len[eid] + 1e-8);
     }
 
-    std::vector<int> Partition_Simplifier::extract_face_edge_index(int fid) {
+    std::vector<int> Partition_Simplifier3::extract_face_edge_index(int fid) {
         std::vector<int> res;
         if(!is_init) {
             return res;
@@ -191,7 +145,7 @@ namespace PrimFit {
         return res;
     }
 
-    int Partition_Simplifier::forward(int cur, int edge) {
+    int Partition_Simplifier3::forward(int cur, int edge, int& ct) {
         int res = -1;
         int cur_label = m_face_label[cur];
         int cur_patch = m_face_patch[cur];
@@ -210,36 +164,44 @@ namespace PrimFit {
             }
         }
         if(count >= 1 && res != -1) {
+            if(ct >= 2) {
                 res = -1;
+            } else {
+                ct += 1;
+            }
         }
         return res;
     }
 
-    void Partition_Simplifier::simplify(float coverage) {
+    void Partition_Simplifier3::simplify(float coverage) {
         if(!is_init) {
             return;
         }
         int num_face = m_face.rows();
-        std::priority_queue<std::pair<double, int>> que;
+        std::priority_queue<node> que;
         for(int i = 0; i < num_face; i++) {
             double fcov = m_face_valid_area[i] / m_face_area[i];
             if(fcov >= coverage) {
-                que.push(std::make_pair(0, i));
+                que.push(node(0, i, 0));
                 vis[i] = 1;
             }
         }
         while(!que.empty()) {
-            double w = que.top().first;
-            int cur = que.top().second;
+            double w = que.top().w;
+//            std::cout << w <<std::endl;
+            int cur = que.top().id;
+            int ct = que.top().ct;
+
             que.pop();
             std::vector<int> e = extract_face_edge_index(cur);
 
             for(size_t i = 0; i < e.size(); i++) {
-                int tar = forward(cur, e[i]);
+                int tmp = ct;
+                int tar = forward(cur, e[i], tmp);
                 if(tar >= 0) {
                     double cc = cover_cost(tar, e[i]);
                     vis[tar] = 1;
-                    que.push(std::make_pair(w - cc, tar));
+                    que.push(node(w + cc, tar, tmp));
                 }
             }
         }

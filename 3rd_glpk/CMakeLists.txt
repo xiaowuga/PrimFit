@@ -210,21 +210,21 @@ add_library(${PROJECT_NAME} STATIC ${glpk_SOURCES} ${glpk_HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${QUADFIT_glpk_DIR}
-    ${QUADFIT_glpk_DIR}/amd
-    ${QUADFIT_glpk_DIR}/api
-    ${QUADFIT_glpk_DIR}/draft
-    ${QUADFIT_glpk_DIR}/bflib
-    ${QUADFIT_glpk_DIR}/cglib
-    ${QUADFIT_glpk_DIR}/colamd
-    ${QUADFIT_glpk_DIR}/env
-    ${QUADFIT_glpk_DIR}/minisat
-    ${QUADFIT_glpk_DIR}/misc
-    ${QUADFIT_glpk_DIR}/mpl
-    ${QUADFIT_glpk_DIR}/npp
-    ${QUADFIT_glpk_DIR}/proxy
-    ${QUADFIT_glpk_DIR}/simplex
-    ${QUADFIT_glpk_DIR}/zlib
+    ${PRIMFIT_glpk_DIR}
+    ${PRIMFIT_glpk_DIR}/amd
+    ${PRIMFIT_glpk_DIR}/api
+    ${PRIMFIT_glpk_DIR}/draft
+    ${PRIMFIT_glpk_DIR}/bflib
+    ${PRIMFIT_glpk_DIR}/cglib
+    ${PRIMFIT_glpk_DIR}/colamd
+    ${PRIMFIT_glpk_DIR}/env
+    ${PRIMFIT_glpk_DIR}/minisat
+    ${PRIMFIT_glpk_DIR}/misc
+    ${PRIMFIT_glpk_DIR}/mpl
+    ${PRIMFIT_glpk_DIR}/npp
+    ${PRIMFIT_glpk_DIR}/proxy
+    ${PRIMFIT_glpk_DIR}/simplex
+    ${PRIMFIT_glpk_DIR}/zlib
     )
 
 if (MSVC)

@@ -8,9 +8,21 @@
 #include <util.h>
 #include <EigenTypedef.h>
 namespace PrimFit {
-    class Partition_Simplifier {
+
+    struct node{
+        double w;
+        int id;
+        int ct;
+        node(double cw, int fid, int x)
+                : w(cw), id(fid), ct(x) {}
+        bool operator < (const node& n) const {
+            return w > n.w;
+        }
+    };
+
+    class Partition_Simplifier3 {
     public:
-        Partition_Simplifier() : is_init(false){};
+        Partition_Simplifier3() : is_init(false){};
         void init(MatrixDr& points_
                   ,MatrixDr& m_vertices_
                   ,MatrixIr& m_face_
@@ -23,7 +35,7 @@ namespace PrimFit {
 
         std::vector<int> extract_face_edge_index(int fid);
 
-        int forward(int cur, int edge);
+        int forward(int cur, int edge, int& ct);
 
         void simplify(float coverage = 0.8);
 

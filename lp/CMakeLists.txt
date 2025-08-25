@@ -25,8 +25,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-        ${QUADFIT_scip_DIR}
-        ${QUADFIT_scip_DIR}/scip)
+        ${PRIMFIT_scip_DIR}
+        ${PRIMFIT_scip_DIR}/scip)
 
 if (MSVC)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
@@ -47,5 +47,5 @@ if (GUROBI_FOUND)
 endif()
 
 
-target_link_libraries( ${PROJECT_NAME} PRIVATE 3rd_scip 3rd_lpsolve 3rd_glpk 3rd_soplex )
+target_link_libraries( ${PROJECT_NAME} PRIVATE 3rd_scip 3rd_lpsolve 3rd_glpk 3rd_soplex)
 #target_link_libraries( ${PROJECT_NAME} PRIVATE 3rd_scip )

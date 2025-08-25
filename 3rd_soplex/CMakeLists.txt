@@ -175,11 +175,11 @@ add_library(${PROJECT_NAME} STATIC ${soplex_SOURCES} ${soplex_HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${QUADFIT_lpsolve_DIR}/shared
-    ${QUADFIT_lpsolve_DIR}/bfp
-    ${QUADFIT_lpsolve_DIR}/bfp/bfp_LUSOL
+    ${PRIMFIT_lpsolve_DIR}/shared
+    ${PRIMFIT_lpsolve_DIR}/bfp
+    ${PRIMFIT_lpsolve_DIR}/bfp/bfp_LUSOL
     ${POLYFIT_lpsolve_DIR}/bfp/bfp_LUSOL/LUSOL
-    ${QUADFIT_lpsolve_DIR}/colamd
+    ${PRIMFIT_lpsolve_DIR}/colamd
     )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE NO_SIGACTION NO_STRTOK_R _CRT_SECURE_NO_WARNINGS TPI_NONE NPARASCIP WITH_SCIPDEF ROUNDING_FE)

@@ -682,9 +682,9 @@ add_library(${PROJECT_NAME} STATIC ${scip_SOURCES} ${scip_HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${QUADFIT_scip_DIR}
-    ${QUADFIT_scip_DIR}/scip
-    ${QUADFIT_soplex_DIR}/src
+    ${PRIMFIT_scip_DIR}
+    ${PRIMFIT_scip_DIR}/scip
+    ${PRIMFIT_soplex_DIR}/src
     )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE NO_SIGACTION NO_STRTOK_R _CRT_SECURE_NO_WARNINGS TPI_NONE NPARASCIP WITH_SCIPDEF ROUNDING_FE)
