@@ -295,51 +295,15 @@ namespace PrimFit {
         vec3 apex = para.pos;
         float angle = para.r1;
         double len = bbox.diagonal_length();
-
-        if(!bbox.contains(apex)) {
-            std::cout << "ASD" <<std::endl;
-        }
         double eps = len * 0.03;
-        float xmin = bbox.min_coord(0) - eps;
-        float xmax = bbox.max_coord(0) + eps;
-        float ymin = bbox.min_coord(1) - eps;
-        float ymax = bbox.max_coord(1) + eps;
-        float zmin = bbox.min_coord(2) - eps;
-        float zmax = bbox.max_coord(2) + eps;
         vec3 base1, base2;
         compute_bases(auv, base1, base2);
 
-        vec3 base_center;
+        double h = (bbox.center() - apex).length() + len;
 
-        double l = 0, r = len;
-        while (r - l > 0.01) {
-            double m = (l + r) / 2;
-            vec3 tp1 = apex + m * auv;
-            double radius = std::fabs(m * std::tan(angle));
-            std::vector<vec3> tmp;
-            tmp.emplace_back(tp1 + base1 * radius);
-            tmp.emplace_back(tp1 + base2 * radius);
-            tmp.emplace_back(tp1 - base1 * radius);
-            tmp.emplace_back(tp1 - base2 * radius);
-            bool flag = true;
-            for (std::size_t j = 0; j < tmp.size(); j++) {
-                if (tmp[j].x >= xmin && tmp[j].x <= xmax
-                    && tmp[j].y >= ymin && tmp[j].y <= ymax
-                    && tmp[j].z >= zmin && tmp[j].z <= zmax) {
-                    flag = false;
-                    break;
-                }
-            }
-            if (flag) {
-                r = m;
-            } else {
-                l = m;
-                base_center = tp1;
-            }
-        }
-
-        double h = (base_center - apex).norm();
-//        h = len;
+        // double h;
+        // // double h = (base_center - apex).norm();
+        // h = 2 * len;
 
         points.resize(n1 * n2 + 1);
 

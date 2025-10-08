@@ -58,7 +58,7 @@ add_subdirectory(io)
 
 add_executable(primfit_cli cli/primfit_cli.cpp)
 target_link_libraries(primfit_cli PUBLIC io algo easy3d::fileio CLI11::CLI11 nlohmann_json::nlohmann_json)
-
+#target_compile_definitions(primfit_cli PUBLIC HAS_GUROBI)
 
 add_subdirectory(efficient_ransac)
 

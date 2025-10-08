@@ -213,6 +213,7 @@ void pblp_step(std::vector<easy3d::vec3>& face_vertices
             ,m_face_point_num,m_face_fit
             ,m_face_valid_area, m_face_area
             ,m_face_color,m_patch_label);
+
     pblp.optimize( para1, para2, para3, LinearProgramSolver::SCIP,  true);
     m_out_vertives = pblp.m_out_vertives;
     m_out_faces = pblp.m_out_faces;
