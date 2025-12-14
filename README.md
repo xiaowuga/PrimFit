@@ -6,12 +6,12 @@
 
 **PrimFit** is the implementation of reconstruction method described in  paper “**Structure–Aware Surface Reconstruction via Primitive Assembly**”.
 
-### 🚀 Windows Executables Released
+### 📢 Windows Version Released
 
-We have released the [**Windows version**](https://github.com/xiaowuga/PrimFit/releases/download/PrimFit_Windows_Release_v1.0/PrimFit_Windows_Release_v1.0.zip) of our method.  
-Feel free to test it and share your feedback.
+The [**Windows Executables**](https://github.com/xiaowuga/PrimFit/releases/tag/PrimFit_Windows_Release_v1.0) are now live. 💻
+Feel free to test and provide feedback. 📝
 
-> ⚠️ **Note:** This release is for evaluation only.
+> ⚠️ **Note:** For evaluation only.
 
 
 ## Platform

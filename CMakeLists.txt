@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 project(PrimFit)
 
+# 可执行文件输出路径
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+# 动态库输出路径 (.dll / .so)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+# 静态库输出路径 (.lib / .a)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+
 # 如果设置了 VCPKG_ROOT 环境变量（推荐使用这个名字）
 if(DEFINED ENV{VCPKG_DIR})
     message(STATUS "Using Vcpkg from: $ENV{VCPKG_DIR}")
